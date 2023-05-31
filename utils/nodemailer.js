@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const { oauth2Client } = require('./oauth2');
+const ejs = require('ejs');
 
 const {
   GOOGLE_CLIENT_ID,
@@ -30,5 +31,19 @@ module.exports = {
     });
 
     transport.sendMail({ to, subject, html });
+  },
+
+  getHtml: (fileName, data) => {
+    return new Promise((resolve, reject) => {
+      const path = `${__dirname}/../views/emailtemplate/${fileName}`;
+
+      ejs.renderFile(path, data, (err, data) => {
+        if(err){
+          return reject(err);
+        } 
+
+        return resolve(data);
+      });
+    });
   }
 };

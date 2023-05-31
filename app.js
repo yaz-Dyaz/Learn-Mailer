@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 app.use('/images', express.static('public/images')); // agar bisa diakses link media nya
+app.set('view engine', 'ejs');
 
 app.use(router);
 

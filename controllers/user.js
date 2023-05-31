@@ -3,6 +3,7 @@ const bcryp = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET_KEY } = process.env;
 const oauth2 = require('../utils/oauth2');
+const nodemailer = require('../utils/nodemailer');
 
 module.exports = {
     register: async (req, res) => {
@@ -134,5 +135,28 @@ module.exports = {
                 token: token
             }
         });
+    },
+    forgotPassword: async (req, res)=>{
+        const {email}= req.body;
+
+        const user = await user.findOne({where:{email}});
+
+        if (user){
+            const payload = {
+                id: user.id
+            };
+
+            const token = await jwt.sign(payload, JWT_SECRET_KEY);
+
+            const url = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
+
+            const html = await nodemailer.getHtml('resetpassword.ejs', {name: user.name, url})
+        }
+
+        return res.status(200).json({
+            status:true,
+            message: `we will send a email if the email is registered!`,
+            data: null
+        })
     }
 };
